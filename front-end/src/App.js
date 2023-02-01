@@ -5,11 +5,14 @@ function App(props) {
   const [usr, setUsr] = useState(
     props.usr !== undefined ? props.usr : "user test"
   );
-  console.log("React props: ", usr);
+  const [pageID, setPageID] = useState(
+    props.pageID !== undefined ? props.pageID : 0
+  );
+  console.log("React props: ", props.usr, props.pageID);
 
   return (
     <div className="App">
-      <OnlineUsers username={"usr"} />
+      <OnlineUsers username={usr} pageID={pageID} />
     </div>
   );
 }

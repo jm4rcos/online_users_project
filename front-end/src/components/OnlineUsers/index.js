@@ -1,52 +1,47 @@
 import React, { useState, useEffect } from "react";
 
-const OnlineUsers = (props) => {
+function OnlineUsers(props) {
   const [connectedUsers, setConnectedUsers] = useState(0);
   const [userList, setUserList] = useState([]);
 
-  console.log("props: ", props.username);
-
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:3333");
-
-    socket.onopen = () => {
-      socket.send(
+    const ws = new WebSocket("ws://localhost:3333");
+    ws.onopen = () => {
+      ws.send(
         JSON.stringify({
-          type: "username",
+          type: "newUser",
           username: props.username,
+          pageID: props.pageID,
         })
       );
     };
 
-    socket.onmessage = (event) => {
+    ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-
-      if (data.type === "connectedUsers") {
-        setConnectedUsers(data.connectedUsers);
-        setUserList(data.userList);
-      }
+      setConnectedUsers(data.connectedUsers);
+      setUserList(data.userList);
     };
 
     return () => {
-      socket.close();
+      ws.close();
     };
-  }, [props.username]);
+  }, [props.username, props.pageID]);
 
-  const user = Object.values(props.username)[0];
-  console.log(props.username, user);
+  const filteredUserList = userList.filter(
+    (user) => user.pageID === props.pageID
+  );
 
   return (
-    <div style={{ background: "lightgreen", padding: "5px" }}>
-      <h2>Usuários conectados</h2>
-      {/* <h3>{user.length !== 0 && user}</h3> */}
-      <p>Quantidade: {connectedUsers}</p>
+    <div>
+      <h3>Online Users:</h3>
+      <p>Connected: {filteredUserList.length}</p>
       <ul>
-        {userList.map((user) => (
-          <li key={user}>{user}</li>
+        {filteredUserList.map((user, index) => (
+          <li key={index}>{user.username}</li>
         ))}
       </ul>
     </div>
   );
-};
+}
 
 export default OnlineUsers;

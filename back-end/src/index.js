@@ -8,19 +8,26 @@ const wss = new WebSocket.Server({ server });
 
 let connectedUsers = 0;
 let userList = [];
-let username;
 
 wss.on("connection", (ws) => {
-  // connectedUsers += 1;
+  let username;
+  let pageID;
+  connectedUsers += 1;
 
   ws.on("message", (message) => {
     const data = JSON.parse(message);
     username = data.username;
-    console.log(data);
+    pageID = data.pageID;
 
-    if (!userList.includes(username)) {
-      userList.push(username);
-      connectedUsers += 1;
+    if (!userList.find((user) => user.username === username)) {
+      userList.push({ username, pageID });
+    } else {
+      userList = userList.map((user) => {
+        if (user.username === username) {
+          user.pageID = pageID;
+        }
+        return user;
+      });
     }
 
     wss.clients.forEach((client) => {
@@ -38,7 +45,7 @@ wss.on("connection", (ws) => {
 
   ws.on("close", () => {
     connectedUsers -= 1;
-    userList = userList.filter((user) => user !== username);
+    userList = userList.filter((user) => user.username !== username);
 
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
