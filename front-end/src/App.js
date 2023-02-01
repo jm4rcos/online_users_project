@@ -9,7 +9,7 @@ function App(props) {
 
   return (
     <div className="App">
-      <OnlineUsers username={usr} />
+      <OnlineUsers username={"usr"} />
     </div>
   );
 }

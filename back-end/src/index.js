@@ -11,7 +11,7 @@ let userList = [];
 let username;
 
 wss.on("connection", (ws) => {
-  connectedUsers += 1;
+  // connectedUsers += 1;
 
   ws.on("message", (message) => {
     const data = JSON.parse(message);
@@ -20,6 +20,7 @@ wss.on("connection", (ws) => {
 
     if (!userList.includes(username)) {
       userList.push(username);
+      connectedUsers += 1;
     }
 
     wss.clients.forEach((client) => {

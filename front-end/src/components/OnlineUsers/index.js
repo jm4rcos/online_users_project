@@ -38,7 +38,7 @@ const OnlineUsers = (props) => {
   return (
     <div style={{ background: "lightgreen", padding: "5px" }}>
       <h2>Usuários conectados</h2>
-      <h3>{user.length !== 0 && user}</h3>
+      {/* <h3>{user.length !== 0 && user}</h3> */}
       <p>Quantidade: {connectedUsers}</p>
       <ul>
         {userList.map((user) => (
