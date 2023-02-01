@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import './styles.css'
 
 function OnlineUsers(props) {
   const [connectedUsers, setConnectedUsers] = useState(0);
@@ -32,10 +33,10 @@ function OnlineUsers(props) {
   );
 
   return (
-    <div>
-      <h3>Online Users:</h3>
-      <p>Connected: {filteredUserList.length}</p>
-      <ul>
+    <div className="online-users-container">
+      <p className="connected-users">Connected: {filteredUserList.length}</p>
+      <h3 className="online-users-header">Online Users:</h3>
+      <ul className="user-list">
         {filteredUserList.map((user, index) => (
           <li key={index}>{user.username}</li>
         ))}

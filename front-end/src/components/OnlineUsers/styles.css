@@ -1,0 +1,38 @@
+.online-users-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  font-family: "Helvetica Neue",Helvetica,Arial;
+  height: 100%;
+  width: 100%;
+}
+
+.online-users-header {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.connected-users {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.user-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-list li {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
