@@ -1,44 +1,50 @@
 import React, { useState, useEffect } from "react";
 
-const useWebSocket = (url, user) => {
-  const [clients, setClients] = useState([]);
-  const [message, setMessage] = useState("");
-  console.log(user);
+const OnlineUsers = (props) => {
+  const [connectedUsers, setConnectedUsers] = useState(0);
+  const [userList, setUserList] = useState([]);
+
+  console.log("props: ", props.username);
 
   useEffect(() => {
-    const ws = new WebSocket(url, user, {
-      headers: {
-        "Sec-WebSocket-Protocol": user,
-      },
-    });
-    ws.onopen = () => {
-      console.log("WebSocket conectado");
-      ws.send(user);
+    const socket = new WebSocket("ws://localhost:3333");
+
+    socket.onopen = () => {
+      socket.send(
+        JSON.stringify({
+          type: "username",
+          username: props.username,
+        })
+      );
     };
-    ws.onmessage = (event) => {
+
+    socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setClients(data.clients);
-      setMessage(data.message);
-    };
-    return () => {
-      if (ws.readyState === 1) {
-        ws.close();
+
+      if (data.type === "connectedUsers") {
+        setConnectedUsers(data.connectedUsers);
+        setUserList(data.userList);
       }
     };
-  }, [url, user]);
 
-  return { clients, message };
-};
+    return () => {
+      socket.close();
+    };
+  }, [props.username]);
 
-const OnlineUsers = ({ username }) => {
-  // O username é uma propriedade atribuida pelo componente App
-  const user = Object.values(username)[0];
-  const { clients, message } = useWebSocket(`ws://localhost:3333`, user);
+  const user = Object.values(props.username)[0];
+  console.log(props.username, user);
+
   return (
-    <div>
-      <p>{message}</p>
-      <p>Usuários online: {clients.length}</p>
-      <p>Usuários: {clients.join(", ")}</p>
+    <div style={{ background: "lightgreen", padding: "5px" }}>
+      <h2>Usuários conectados</h2>
+      <h3>{user.length !== 0 && user}</h3>
+      <p>Quantidade: {connectedUsers}</p>
+      <ul>
+        {userList.map((user) => (
+          <li key={user}>{user}</li>
+        ))}
+      </ul>
     </div>
   );
 };

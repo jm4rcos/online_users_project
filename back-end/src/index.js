@@ -1,37 +1,58 @@
+const express = require("express");
+const http = require("http");
 const WebSocket = require("ws");
-const server = new WebSocket.Server({ port: 3333 });
 
-let clients = new Map();
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-server.on("connection", (ws, req) => {
-  const user = req.headers["sec-websocket-protocol"];
+let connectedUsers = 0;
+let userList = [];
+let username;
 
-  console.log(user);
+wss.on("connection", (ws) => {
+  connectedUsers += 1;
 
-  clients.set(user, ws);
-  console.log(
-    `Novo cliente conectado: "${user}", total de usuários online: ${clients.size}`
-  );
-  console.log(
-    `Novo cliente conectado: ${user}, total de usuários online: ${clients.size}`
-  );
+  ws.on("message", (message) => {
+    const data = JSON.parse(message);
+    username = data.username;
+    console.log(data);
 
-  ws.send(`Bem-vindo ${user}! Total de usuários online: ${clients.size}`);
-  broadcast(
-    `Novo usuário ${user} conectado, total de usuários online: ${clients.size}`
-  );
+    if (!userList.includes(username)) {
+      userList.push(username);
+    }
+
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(
+          JSON.stringify({
+            type: "connectedUsers",
+            connectedUsers,
+            userList,
+          })
+        );
+      }
+    });
+  });
 
   ws.on("close", () => {
-    clients.delete(user);
-    console.log(
-      `Cliente desconectado: ${user}, total de usuários online: ${clients.size}`
-    );
-    broadcast(
-      `Usuário ${user} desconectado, total de usuários online: ${clients.size}`
-    );
+    connectedUsers -= 1;
+    userList = userList.filter((user) => user !== username);
+
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(
+          JSON.stringify({
+            type: "connectedUsers",
+            connectedUsers,
+            userList,
+          })
+        );
+      }
+    });
   });
 });
 
-const broadcast = (message) => {
-  clients.forEach((ws) => ws.send(message));
-};
+server.listen(3333, () => {
+  console.log("Servidor iniciado na porta 3333");
+});
